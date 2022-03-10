@@ -46,6 +46,7 @@ import org.spongepowered.gradle.vanilla.internal.repository.modifier.AccessWiden
 import org.spongepowered.gradle.vanilla.internal.repository.modifier.ArtifactModifier;
 import org.spongepowered.gradle.vanilla.runs.RunConfiguration;
 import org.spongepowered.gradle.vanilla.runs.RunConfigurationContainer;
+import org.spongepowered.gradle.vanilla.internal.repository.modifier.ParchmentModifier;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +65,7 @@ public class MinecraftExtensionImpl implements MinecraftExtension {
     // User-set properties
     private final Provider<MinecraftProviderService> providerService;
     private final Property<String> version;
+    private final Property<String> parchmentSpec;
     private final Property<MinecraftPlatform> platform;
     private final Property<Boolean> injectRepositories;
     private final DirectoryProperty sharedCache;
@@ -84,6 +86,7 @@ public class MinecraftExtensionImpl implements MinecraftExtension {
         this.project = project;
         this.providerService = providerService;
         this.version = factory.property(String.class);
+        this.parchmentSpec = factory.property(String.class);
         this.platform = factory.property(MinecraftPlatform.class).convention(MinecraftPlatform.JOINED);
         this.injectRepositories = factory.property(Boolean.class).convention(project.provider(() -> !gradle.getPlugins().hasPlugin(MinecraftRepositoryPlugin.class))); // only inject if we aren't already in Settings
         this.accessWideners = factory.fileCollection();
@@ -234,6 +237,9 @@ public class MinecraftExtensionImpl implements MinecraftExtension {
             if (!this.accessWideners.isEmpty()) {
                 modifiers.add(new AccessWidenerModifier(this.accessWideners.getFiles()));
             }
+            if (this.parchmentSpec.isPresent()) {
+                modifiers.add(new ParchmentModifier(project, this.parchmentSpec.get()));
+            }
             return this.lazyModifiers = Collections.unmodifiableSet(modifiers);
         }
         return this.lazyModifiers;
@@ -264,6 +270,11 @@ public class MinecraftExtensionImpl implements MinecraftExtension {
     @Override
     public void runs(final Action<RunConfigurationContainer> run) {
         Objects.requireNonNull(run, "run").execute(this.runConfigurations);
+    }
+
+    @Override
+    public void parchment(String parchmentSpec) {
+        this.parchmentSpec.set(parchmentSpec);
     }
 
     public Provider<VersionDescriptor.Full> targetVersion() {

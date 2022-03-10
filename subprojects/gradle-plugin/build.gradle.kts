@@ -46,6 +46,7 @@ dependencies {
 
     // Just main
     implementation("com.google.code.gson:gson:2.8.7")
+    implementation("org.parchmentmc.feather:io-gson:0.6.5")
 
     compileOnlyApi("org.checkerframework:checker-qual:3.15.0")
     annotationProcessor("org.immutables:value:2.8.8")

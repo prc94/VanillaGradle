@@ -137,4 +137,12 @@ public interface MinecraftExtension extends MinecraftRepositoryExtension {
      */
     void runs(Action<RunConfigurationContainer> run);
 
+    /**
+     * Apply Parchment mappings to decompiled code
+     *
+     * Warning: You need to declare maven repository containing respective artifact first!
+     *
+     * @param parchmentSpec parchment mappings' maven dependency spec
+     */
+    void parchment(String parchmentSpec);
 }
